@@ -5,10 +5,19 @@ from flask import render_template
 from flask import session
 from flask import redirect
 from markupsafe import escape
+import logging
 
 app = Flask(__name__)
 
 #flash pour les messages
+
+def get_db():
+    return sqlite3.connect('db.sqlite')
+
+if not Path('db.sqlite').exists():
+    db = get_db()
+    sql = Path('db.sql').read_text()
+    db.executescript(sql)
 
 @app.route('/login', methods=['POST', 'GET'])
 def login(redirect=None):
@@ -30,13 +39,16 @@ def hello(name=None):
     return render_template('hello.html', name=name)
 
 def checkSession():
-    if 'username' in session:
-        return f'Logged in as {session["username"]}'
-    return redirect(url_for('login'))
+    if 'username' not in session:
+        return 'not connected'
+    return None
 
 @app.route('/')
 def index():
-    return checkSession()
+    error = checkSession()
+    if error != None:
+        return redirect(url_for('login'))
+    return f'Index'
 
 # @app.route('/login', methods=['GET', 'POST'])
 # def login():
