@@ -28,14 +28,17 @@ if not Path('db.sqlite').exists():
 def login():
     error = None
     if request.method == 'POST':
-        if valid_login(request.form['username'],
-                       request.form['password']):
+        if valid_login(request.form['username'], request.form['password']):
+            conn = get_db()
+            result = conn.execute('SELECT id, email FROM users WHERE username = ?', [request.form['username']])
+            row = result.fetchone()
+            session['id'] = row[0]
+            session['email'] = row[1]
             session['username'] = request.form['username']
+            conn.close()
             return redirect(url_for('index'))
         else:
             error = 'Invalid username/password'
-    # the code below is executed if the request method
-    # was GET or the credentials were invalid
     return render_template('login.html', error=error)
 
 @app.route('/register', methods=['POST', 'GET'])
@@ -53,38 +56,39 @@ def register():
     return render_template('register.html', error=error)
 
 def valid_login(username, password):
-    db = get_db()
-    result = db.execute('SELECT password FROM users WHERE username = ?', [username])
+    conn = get_db()
+    result = conn.execute('SELECT password FROM users WHERE username = ?', [username])
     row = result.fetchone()
+    conn.close()
     if row is not None and row[0] == password:
         return True
     else:
         return False
 
 def register_user(username, password, email):
-    db = get_db()
+    conn = get_db()
     try:
-        db.execute('INSERT INTO users (username, password, email) VALUES (?, ?, ?)', [username, password, email])
-        db.commit()
-        db.close()
+        conn.execute('INSERT INTO users (username, password, email) VALUES (?, ?, ?)', [username, password, email])
+        conn.commit()
+        conn.close()
         return True
     except Exception as e:
         print(e)
-        db.rollback()
-        db.close()
+        conn.rollback()
+        conn.close()
         return False
 
 def checkSession():
     if 'username' not in session:
-        return 'not connected'
-    return None
+        return None
+    return session['username']
 
 @app.route('/')
 def index():
-    error = checkSession()
-    if error != None:
+    username = checkSession()
+    if username is None:
         return redirect(url_for('login'))
-    return render_template('index.html', error=error)
+    return render_template('index.html', username=username)
 
 @app.route('/logout')
 def logout():

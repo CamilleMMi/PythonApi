@@ -1,29 +1,20 @@
-<!doctype html>
-<html>
-  <head>
-    <title>Inscription</title>
-  </head>
-  <body>
-    <h1>Inscription</h1>
-    {% if error %}
-      <p style="color: red;">{{ error }}</p>
-    {% endif %}
-    <form method="post" action="{{ url_for('register') }}">
-      <p>
+{% block content %}
+<h1>Inscription</h1>
+<form method="post" action="{{ url_for('register') }}">
+    <p>
         <label for="username">Nom d'utilisateur:</label>
         <input type="text" name="username" id="username" required>
-      </p>
-      <p>
+    </p>
+    <p>
         <label for="password">Mot de passe:</label>
         <input type="password" name="password" id="password" required>
-      </p>
-      <p>
+    </p>
+    <p>
         <label for="email">Email:</label>
         <input type="text" name="email" id="email" required>
-      </p>
-      <p>
+    </p>
+    <p>
         <input type="submit" value="S'inscrire">
-      </p>
-    </form>
-  </body>
-</html>
+    </p>
+</form>
+{% endblock %}
