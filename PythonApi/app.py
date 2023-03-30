@@ -8,8 +8,11 @@ from pathlib import Path
 from markupsafe import escape
 import logging
 import sqlite3
+import secrets
 
 app = Flask(__name__)
+
+app.secret_key = secrets.token_hex(16)
 
 #flash pour les messages
 
@@ -22,23 +25,54 @@ if not Path('db.sqlite').exists():
     db.executescript(sql)
 
 @app.route('/login', methods=['POST', 'GET'])
-def login(redirect=None):
-    return f'Salut'
-    # error = None
-    # if request.method == 'POST':
-    #     if valid_login(request.form['username'],
-    #                    request.form['password']):
-    #         return log_the_user_in(request.form['username'])
-    #     else:
-    #         error = 'Invalid username/password'
-    # # the code below is executed if the request method
-    # # was GET or the credentials were invalid
-    # return render_template('login.html', error=error)
+def login():
+    error = None
+    if request.method == 'POST':
+        if valid_login(request.form['username'],
+                       request.form['password']):
+            session['username'] = request.form['username']
+            return redirect(url_for('index'))
+        else:
+            error = 'Invalid username/password'
+    # the code below is executed if the request method
+    # was GET or the credentials were invalid
+    return render_template('login.html', error=error)
 
-@app.route('/hello/')
-@app.route('/hello/<name>')
-def hello(name=None):
-    return render_template('hello.html', name=name)
+@app.route('/register', methods=['POST', 'GET'])
+def register():
+    error = None
+    if request.method == 'POST':
+        if register_user(request.form['username'],
+                       request.form['password'],
+                       request.form['email']):
+            return redirect(url_for('index'))
+        else:
+            error = 'Registration failed'
+    # the code below is executed if the request method
+    # was GET or the registration failed
+    return render_template('register.html', error=error)
+
+def valid_login(username, password):
+    db = get_db()
+    result = db.execute('SELECT password FROM users WHERE username = ?', [username])
+    row = result.fetchone()
+    if row is not None and row[0] == password:
+        return True
+    else:
+        return False
+
+def register_user(username, password, email):
+    db = get_db()
+    try:
+        db.execute('INSERT INTO users (username, password, email) VALUES (?, ?, ?)', [username, password, email])
+        db.commit()
+        db.close()
+        return True
+    except Exception as e:
+        print(e)
+        db.rollback()
+        db.close()
+        return False
 
 def checkSession():
     if 'username' not in session:
@@ -50,19 +84,7 @@ def index():
     error = checkSession()
     if error != None:
         return redirect(url_for('login'))
-    return f'Index'
-
-# @app.route('/login', methods=['GET', 'POST'])
-# def login():
-#     if request.method == 'POST':
-#         session['username'] = request.form['username']
-#         return redirect(url_for('index'))
-#     return '''
-#         <form method="post">
-#             <p><input type=text name=username>
-#             <p><input type=submit value=Login>
-#         </form>
-#     '''
+    return render_template('index.html', error=error)
 
 @app.route('/logout')
 def logout():
@@ -70,18 +92,5 @@ def logout():
     session.pop('username', None)
     return redirect(url_for('index'))
 
-@app.route('/user/<username>')
-def show_user_profile(username):
-    return f'User {escape(username)}'
-
-@app.route('/post/<int:post_id>')
-def show_post(post_id):
-    return f'Post {post_id}'
-
-@app.route('/path/<path:subpath>')
-def show_subpath(subpath):
-    return f'Subpath {escape(subpath)}'
-
 with app.test_request_context():
-    print(url_for('hello', name='Camille'))
     print(url_for('index'))
