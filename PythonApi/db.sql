@@ -16,6 +16,7 @@ CREATE TABLE watching_list (
     viewing_name VARCHAR(255) NOT NULL,
     platform VARCHAR(255) NOT NULL,
     advancement VARCHAR(255) NOT NULL,
+    active BOOLEAN NOT NULL DEFAULT TRUE,
     user_id INT NOT NULL,
     FOREIGN KEY (user_id) REFERENCES users(id)
 );

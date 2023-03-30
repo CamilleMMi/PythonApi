@@ -11,7 +11,6 @@ import sqlite3
 import secrets
 
 app = Flask(__name__)
-
 app.secret_key = secrets.token_hex(16)
 
 #flash pour les messages
@@ -23,6 +22,11 @@ if not Path('db.sqlite').exists():
     db = get_db()
     sql = Path('db.sql').read_text()
     db.executescript(sql)
+
+def checkSession():
+    if 'username' not in session:
+        return None
+    return session['username']
 
 @app.route('/login', methods=['POST', 'GET'])
 def login():
@@ -41,6 +45,22 @@ def login():
             error = 'Invalid username/password'
     return render_template('login.html', error=error)
 
+def valid_login(username, password):
+    conn = get_db()
+    result = conn.execute('SELECT password FROM users WHERE username = ?', [username])
+    row = result.fetchone()
+    conn.close()
+    if row is not None and row[0] == password:
+        return True
+    else:
+        return False
+
+@app.route('/logout')
+def logout():
+    # remove the username from the session if it's there
+    session.pop('username', None)
+    return redirect(url_for('index'))
+
 @app.route('/register', methods=['POST', 'GET'])
 def register():
     error = None
@@ -55,16 +75,6 @@ def register():
     # was GET or the registration failed
     return render_template('register.html', error=error)
 
-def valid_login(username, password):
-    conn = get_db()
-    result = conn.execute('SELECT password FROM users WHERE username = ?', [username])
-    row = result.fetchone()
-    conn.close()
-    if row is not None and row[0] == password:
-        return True
-    else:
-        return False
-
 def register_user(username, password, email):
     conn = get_db()
     try:
@@ -78,11 +88,6 @@ def register_user(username, password, email):
         conn.close()
         return False
 
-def checkSession():
-    if 'username' not in session:
-        return None
-    return session['username']
-
 @app.route('/')
 def index():
     username = checkSession()
@@ -90,11 +95,6 @@ def index():
         return redirect(url_for('login'))
     return render_template('index.html', username=username)
 
-@app.route('/logout')
-def logout():
-    # remove the username from the session if it's there
-    session.pop('username', None)
-    return redirect(url_for('index'))
-
-with app.test_request_context():
-    print(url_for('index'))
+@app.route('/addWatchList')
+def addWatchList():
+    return render_template('addWatchList.html')

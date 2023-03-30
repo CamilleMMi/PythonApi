@@ -1,8 +1,5 @@
 {% block content %}
-{% if username %}
 <h2>Bienvenue, {{ username }} !</h2>
-{% else %}
-<p>Veuillez vous connecter pour accéder à cette page.</p>
-{% endif %}
+<button><a href="{{ url_for('addWatchList') }}">Rajout d'un média a regarder</a></button>
 <a href="{{ url_for('logout') }}">Se déconnecter</a>
 {% endblock %}

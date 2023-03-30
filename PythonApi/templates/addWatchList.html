@@ -1,0 +1,21 @@
+{% block content %}
+<h2>Rajout d'un média à la Watch List</h2>
+<form method="post" action="{{ url_for('addWatchList') }}">
+    <p>
+        <label for="viewing_name">Nom du média à regarder:</label>
+        <input type="text" name="viewing_name" id="viewing_name" required>
+    </p>
+    <p>
+        <label for="platform">Plateforme du média:</label>
+        <input type="text" name="platform" id="platform" required>
+    </p>
+    <p>
+        <label for="advancement">Avancement dans la serie / film:</label>
+        <input type="text" name="advancement" id="advancement" required>
+    </p>
+    <p>
+        <input type="submit" value="Enregistrer dans la Watch List">
+    </p>
+</form>
+<a href="{{ url_for('index') }}">Annuler</a>
+{% endblock %}
