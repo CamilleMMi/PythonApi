@@ -153,8 +153,6 @@ def addItemToWatchList():
         db.commit()
         db.close()
 
-        print(viewing_name, platform, advancement)
-
         # Redirect to the index page
         return redirect(url_for("index"))
     else:
