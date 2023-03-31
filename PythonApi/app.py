@@ -105,9 +105,54 @@ def index():
     username = checkSession()
     if username is None:
         return redirect(url_for("login"))
-    return render_template("index.html", username=username)
+
+    # Get the user ID from the session
+    user_id = session.get("id")
+
+    # Query the database for all entries in the watching_list table for the current user
+    db = get_db()
+    current = db.execute("SELECT * FROM watching_list WHERE user_id = ?", (user_id,))
+    rows = current.fetchall()
+
+    watching_list = []
+    for row in rows:
+        watching_list.append(
+            {"viewing_name": row[1], "platform": row[2], "advancement": row[3]}
+        )
+
+    db.commit()
+    db.close()
+
+    # Render the template with the data
+    return render_template("index.html", username=username, watching_list=watching_list)
 
 
-@app.route("/addWatchList")
-def addWatchList():
-    return render_template("addWatchList.html")
+@app.route("/addWatchList", methods=["GET", "POST"])
+def addItemToWatchList():
+    username = checkSession()
+    if username is None:
+        return redirect(url_for("login"))
+    if request.method == "POST":
+        # Get the data from the form
+        viewing_name = request.form["viewing_name"]
+        platform = request.form["platform"]
+        advancement = request.form["advancement"]
+
+        # Get the user ID from the session
+        user_id = session.get("id")
+
+        # Insert the data into the database
+        db = get_db()
+        db.execute(
+            "INSERT INTO watching_list (viewing_name, platform, advancement, user_id) VALUES (?, ?, ?, ?)",
+            (viewing_name, platform, advancement, user_id),
+        )
+        db.commit()
+        db.close()
+
+        print(viewing_name, platform, advancement)
+
+        # Redirect to the index page
+        return redirect(url_for("index"))
+    else:
+        return render_template("addWatchList.html")
