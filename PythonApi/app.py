@@ -111,20 +111,23 @@ def index():
 
     # Query the database for all entries in the watching_list table for the current user
     db = get_db()
-    current = db.execute("SELECT * FROM watching_list WHERE user_id = ?", (user_id,))
-    rows = current.fetchall()
+    watching_list = db.execute(
+        "SELECT id, viewing_name, platform, advancement FROM watching_list WHERE user_id = ?",
+        [user_id],
+    ).fetchall()
 
-    watching_list = []
-    for row in rows:
-        watching_list.append(
-            {"viewing_name": row[1], "platform": row[2], "advancement": row[3]}
+    watching_list_formatted = []
+    for row in watching_list:
+        watching_list_formatted.append(
+            {"viewing_name": row[1], "platform": row[2], "advancement": row[3], "id": row[0] }
         )
 
     db.commit()
     db.close()
 
     # Render the template with the data
-    return render_template("index.html", username=username, watching_list=watching_list)
+    return render_template("index.html", username=username, watching_list=watching_list_formatted)
+
 
 
 @app.route("/addWatchList", methods=["GET", "POST"])
@@ -156,3 +159,16 @@ def addItemToWatchList():
         return redirect(url_for("index"))
     else:
         return render_template("addWatchList.html")
+
+@app.route("/deleteItem/<int:item_id>", methods=["POST"])
+def deleteItemFromWatchList(item_id):
+    username = checkSession()
+    if username is None:
+        return redirect(url_for("login"))
+
+    db = get_db()
+    user_id = session.get("id")
+    db.execute("DELETE FROM watching_list WHERE id = ? AND user_id = ?", (item_id, user_id))
+    db.commit()
+    db.close()
+    return redirect(url_for("index"))

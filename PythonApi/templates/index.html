@@ -12,9 +12,11 @@
     Titre : {{ entry['viewing_name'] }} <br />
     Plateforme : {{ entry['platform'] }} <br />
     Avancement : {{ entry['advancement'] }}
+    <form method="POST" action="{{ url_for('deleteItemFromWatchList', item_id=entry['id']) }}">
+      <button type="submit">Supprimer</button>
+    </form>
   </li>
   <br />
   {% endfor %}
 </ul>
-
 {% endblock %}
