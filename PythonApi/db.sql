@@ -31,5 +31,5 @@ INSERT INTO watching_list(viewing_name, platform, advancement, user_id) VALUES
     ("one piece", "netflix", "episode 1 saison 1", 1),
     ("split", "streaming", "", 1),
     ("Squeezie thread horreur", "youtube", "12:10", 1),
-    ("Batman", "netflix", "", 0),
-    ("Heredity", "amazon prime video", "1H 10", 0);
+    ("Batman", "netflix", "", 2),
+    ("Heredity", "amazon prime video", "1H 10", 2);

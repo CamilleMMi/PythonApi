@@ -1,6 +1,8 @@
 {% block content %}
 <h2>Bienvenue, {{ username }} !</h2>
-<button><a href="{{ url_for('addWatchList') }}">Rajout d'un média a regarder</a></button>
+<button>
+  <a href="{{ url_for('addItemToWatchList') }}">Rajout d'un média a regarder</a>
+</button>
 <a href="{{ url_for('logout') }}">Se déconnecter</a>
 
 <h3>Ma liste</h3>
