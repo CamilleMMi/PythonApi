@@ -1,6 +1,6 @@
 {% block content %}
 <h2>Rajout d'un média à la Watch List</h2>
-<form method="post" action="{{ url_for('addWatchList') }}">
+<form method="post" action="{{ url_for('addItemToWatchList') }}">
     <p>
         <label for="viewing_name">Nom du média à regarder:</label>
         <input type="text" name="viewing_name" id="viewing_name" required>
