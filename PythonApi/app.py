@@ -16,9 +16,9 @@ app.secret_key = secrets.token_hex(16)
 #flash pour les messages
 
 def get_db():
-    return sqlite3.connect('db.sqlite')
+    return sqlite3.connect('instance/db.sqlite')
 
-if not Path('db.sqlite').exists():
+if not Path('instance/db.sqlite').exists():
     db = get_db()
     sql = Path('db.sql').read_text()
     db.executescript(sql)
@@ -57,7 +57,6 @@ def valid_login(username, password):
 
 @app.route('/logout')
 def logout():
-    # remove the username from the session if it's there
     session.pop('username', None)
     return redirect(url_for('index'))
 
@@ -71,8 +70,6 @@ def register():
             return redirect(url_for('index'))
         else:
             error = 'Registration failed'
-    # the code below is executed if the request method
-    # was GET or the registration failed
     return render_template('register.html', error=error)
 
 def register_user(username, password, email):

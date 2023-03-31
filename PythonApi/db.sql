@@ -20,3 +20,16 @@ CREATE TABLE watching_list (
     user_id INT NOT NULL,
     FOREIGN KEY (user_id) REFERENCES users(id)
 );
+
+INSERT INTO users(email, username, password) VALUES
+    ("admin.email@gmail.com","admin", "password"),
+    ("camillemichaudmeli@gmail.com","Camille", "Camille"),
+    ("userlambda@gmail.com","User", "password");
+
+INSERT INTO watching_list(viewing_name, platform, advancement, user_id) VALUES
+    ("naruto", "netflix", "episode 12 saison 2", 1),
+    ("one piece", "netflix", "episode 1 saison 1", 1),
+    ("split", "streaming", "", 1),
+    ("Squeezie thread horreur", "youtube", "12:10", 1),
+    ("Batman", "netflix", "", 0),
+    ("Heredity", "amazon prime video", "1H 10", 0);
