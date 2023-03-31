@@ -2,4 +2,17 @@
 <h2>Bienvenue, {{ username }} !</h2>
 <button><a href="{{ url_for('addWatchList') }}">Rajout d'un média a regarder</a></button>
 <a href="{{ url_for('logout') }}">Se déconnecter</a>
+
+<h3>Ma liste</h3>
+<ul>
+  {% for entry in watching_list %}
+  <li>
+    Titre : {{ entry['viewing_name'] }} <br />
+    Plateforme : {{ entry['platform'] }} <br />
+    Avancement : {{ entry['advancement'] }}
+  </li>
+  <br />
+  {% endfor %}
+</ul>
+
 {% endblock %}
